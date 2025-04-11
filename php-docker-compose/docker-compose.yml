@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  #default app with php-fpm
+  app:
+    build:
+      context: .
+      dockerfile: app_dockerfile
+      args:
+        APP_ENV: ${APP_ENV}
+        PHP_VERSION: ${PHP_VERSION}
+        INSTALL_XDEBUG: ${INSTALL_XDEBUG}
+        INSTALL_PHPREDIS: ${INSTALL_PHPREDIS}
+        INSTALL_COMPOSER: ${INSTALL_COMPOSER}
+        INSTALL_PGSQL: ${INSTALL_PGSQL}
+        INSTALL_ZIP: ${INSTALL_ZIP}
+        INSTALL_GD: ${INSTALL_GD}
+        NGINX_PHP_UPSTREAM_PORT: ${NGINX_PHP_UPSTREAM_PORT}
+        FROM_PHP_INI_DIR: ${FROM_PHP_INI_DIR}
+        TO_PHP_INI_DIR: ${TO_PHP_INI_DIR}
+    container_name: ${COMPOSE_PROJECT_NAME}_app
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: ${COMPOSE_PROJECT_NAME}_postgres
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_HOST: ${COMPOSE_PROJECT_NAME}_redis
+      SESSION_DRIVER: redis
+      CACHE_DRIVER: redis
+      QUEUE_CONNECTION: redis
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ${FROM_PHP_INI_DIR}/php-${PHP_VERSION}-${APP_ENV}.ini:${TO_PHP_INI_DIR}/php.ini
+    networks:
+      - default
+      - services
+
+  #Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-webserver
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ./server/nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+    networks:
+      - default
+      - services
+
+  postgres:
+    image: postgres:latest
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: ${COMPOSE_PROJECT_NAME}_redis
+    volumes:
+      - redisdata:/data
+    networks:
+      - default
+
+#Docker Networks
+networks:
+  default:
+    driver: bridge
+  services:
+    external: true
+
+#Volumes
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local

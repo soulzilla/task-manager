@@ -1,0 +1,66 @@
+# Download official image of php with extensions
+ARG PHP_VERSION
+FROM php:${PHP_VERSION}-fpm-alpine
+
+# Set working directory
+WORKDIR /var/www
+
+# Install dependencies
+RUN apk update && apk add \
+  curl \
+  postgresql-dev
+
+# Install extensions
+RUN curl -sSLf \
+        -o /usr/local/bin/install-php-extensions \
+        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
+    chmod +x /usr/local/bin/install-php-extensions
+
+ARG INSTALL_XDEBUG=false
+ARG INSTALL_PHPREDIS=false
+ARG INSTALL_PGSQL=false
+ARG INSTALL_ZIP=false
+ARG INSTALL_GD=false
+
+RUN set -eux; \
+    extensions="pcntl opcache intl pdo_pgsql"; \
+    if [ "$INSTALL_ZIP" = "true" ]; then \
+        extensions="$extensions zip"; \
+    fi; \
+    if [ "$INSTALL_GD" = "true" ]; then \
+        extensions="$extensions gd exif"; \
+    fi; \
+    if [ "$INSTALL_PGSQL" = "true" ]; then \
+        extensions="$extensions pgsql"; \
+    fi; \
+    if [ "$INSTALL_XDEBUG" = "true" ]; then \
+        extensions="$extensions xdebug"; \
+    fi; \
+    if [ "$INSTALL_PHPREDIS" = "true" ]; then \
+        extensions="$extensions redis"; \
+    fi; \
+    install-php-extensions $extensions
+
+# Install composer
+ARG INSTALL_COMPOSER=false
+RUN if [ ${INSTALL_COMPOSER} = true ]; then \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+;fi
+
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
+
+# Add user for laravel application
+RUN addgroup -g ${PGID} www
+RUN adduser --disabled-password -H -u ${PUID} -s /bin/bash -G www www
+
+# Change current user to www
+USER www
+
+# Expose port 9000 and start php-fpm server
+ARG NGINX_PHP_UPSTREAM_PORT=9000
+
+EXPOSE ${NGINX_PHP_UPSTREAM_PORT}
+CMD ["php-fpm"]

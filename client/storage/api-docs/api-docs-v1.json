@@ -1,0 +1,343 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Task Manager API",
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://tm.localho.st/api/v1"
+        }
+    ],
+    "paths": {
+        "/tasks": {
+            "post": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Создать новую задачу",
+                "operationId": "createTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTaskRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешно создана задача",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateTaskResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/{id}": {
+            "delete": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Удалить задачу",
+                "operationId": "deleteTask",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteTaskRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Успешно удалена задача",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateTaskResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Клиентская ошибка",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Редактировать задачу",
+                "operationId": "updateTask",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор задачи для обновления",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTaskRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешно обновлена задача",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateTaskResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Клиентская ошибка",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "EmptyOutput": {
+                "description": "Пустой ответ",
+                "type": "object"
+            },
+            "CreateTaskRequest": {
+                "description": "Запрос на создание задачи",
+                "properties": {
+                    "title": {
+                        "description": "Название задачи",
+                        "type": "string",
+                        "example": "Завершить проект"
+                    },
+                    "description": {
+                        "description": "Описание задачи",
+                        "type": "string",
+                        "example": "Необходимо завершить проект до конца месяца"
+                    },
+                    "status": {
+                        "description": "Статус задачи",
+                        "type": "string",
+                        "example": "todo",
+                        "nullable": true
+                    },
+                    "importance": {
+                        "description": "Важность задачи (1-5)",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "deadline": {
+                        "description": "Крайний срок выполнения задачи (Unix Timestamp)",
+                        "type": "string",
+                        "format": "timestamp",
+                        "example": "1697040000"
+                    }
+                },
+                "type": "object"
+            },
+            "DeleteTaskRequest": {
+                "description": "Запрос на удаление задачи",
+                "type": "object"
+            },
+            "UpdateTaskRequest": {
+                "description": "Запрос на обновление задачи",
+                "required": [
+                    "title",
+                    "description",
+                    "importance",
+                    "deadline"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Название задачи",
+                        "type": "string",
+                        "example": "Обновить документацию"
+                    },
+                    "description": {
+                        "description": "Описание задачи",
+                        "type": "string",
+                        "example": "Необходимо обновить документацию для API"
+                    },
+                    "status": {
+                        "description": "Статус задачи",
+                        "type": "string",
+                        "enum": [
+                            "todo",
+                            "in_progress",
+                            "completed"
+                        ],
+                        "example": "todo"
+                    },
+                    "importance": {
+                        "description": "Важность задачи (1-5)",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "deadline": {
+                        "description": "Дедлайн задачи в формате Unix-времени",
+                        "type": "string",
+                        "example": "2025-12-31 23:59:59"
+                    }
+                },
+                "type": "object"
+            },
+            "ClientErrorResponse": {
+                "title": "ClientErrorResponse",
+                "description": "Клиентская ошибка",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Task with ID `id` not found"
+                    },
+                    "error_code": {
+                        "type": "string",
+                        "example": "task_not_found"
+                    }
+                },
+                "type": "object"
+            },
+            "ServerErrorResponse": {
+                "title": "ServerErrorResponse",
+                "description": "Клиентская ошибка",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Houston, we have a problem"
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationErrorResponse": {
+                "title": "ValidationErrorResponse",
+                "description": "Ошибка валидации",
+                "properties": {
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CreateTaskResponse": {
+                "description": "Ответ на успешное создание задачи. Тело ответа пустое.",
+                "type": "object"
+            },
+            "DeleteTaskResponse": {
+                "description": "Ответ на успешное удаление задачи. Тело ответа пустое.",
+                "type": "object"
+            },
+            "UpdateTaskResponse": {
+                "description": "Ответ на успешное обновление задачи. Тело ответа пустое.",
+                "type": "object"
+            }
+        },
+        "parameters": {
+            "DeleteTaskRequest_id": {
+                "name": "id",
+                "in": "path",
+                "description": "Идентификатор задачи для удаления",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "tasks",
+            "description": "tasks"
+        }
+    ]
+}
