@@ -1,4 +1,4 @@
-# Название проекта
+# Task Manager Test Application
 
 ## Обзор
 
@@ -44,3 +44,5 @@
 - Сгенерирует документацию Swagger.
 
 Предварительно можете настроить **.env**, **server/nginx/conf.d/app.conf** и **docker-compose.yml**, если это необходимо.
+
+Swagger будет доступен по адресу: http://{localhost}/api/v1/docs
