@@ -15,8 +15,8 @@ class TaskEntityToTaskModelMapper
         $model->title = $entity->getTitle();
         $model->description = $entity->getDescription();
         $model->status = $entity->getStatus()?->value;
-        $model->created_at = $entity->getCreatedAt();
-        $model->updated_at = $entity->getUpdatedAt();
+        $model->importance = $entity->getImportance();
+        $model->deadline = $entity->getDeadline();
 
         return $model;
     }

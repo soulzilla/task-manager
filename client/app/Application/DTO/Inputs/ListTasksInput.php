@@ -2,7 +2,10 @@
 
 namespace App\Application\DTO\Inputs;
 
-class ListTasksInput
+readonly class ListTasksInput
 {
-
+    public function __construct(
+        public ?string $status = null,
+    ) {
+    }
 }

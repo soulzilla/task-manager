@@ -11,7 +11,7 @@ class TasksService
         TaskEntity $task,
         ?string $title = null,
         ?string $description = null,
-        TaskStatus $status = null,
+        ?TaskStatus $status = null,
         ?int $importance = null,
         ?string $deadline = null
     ): void
@@ -42,5 +42,26 @@ class TasksService
         if ($task->getStatus() === null) {
             $task->setStatus(TaskStatus::TODO);
         }
+    }
+
+    public function calculatePriorityScore(TaskEntity $task): void
+    {
+        $priorityScore = 0.0;
+
+        if ($task->getStatus() && $task->getStatus() === TaskStatus::COMPLETED) {
+            $task->setPriorityScore($priorityScore);
+            return;
+        }
+
+        if ($task->getDeadline() && $task->getDeadline() < date('Y-m-d H:i:s')) {
+            $task->setIsOverdue(true);
+            return;
+        }
+
+        $daysUntilDeadline = (strtotime($task->getDeadline()) - time()) / (60 * 60 * 24);
+
+        $priorityScore = $task->getImportance() * (1/$daysUntilDeadline);
+        $priorityScore = round($priorityScore, 2);
+        $task->setPriorityScore($priorityScore);
     }
 }

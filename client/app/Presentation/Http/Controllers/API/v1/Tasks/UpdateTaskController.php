@@ -26,7 +26,8 @@ use OpenApi\Attributes as OA;
             required: true,
             schema: new OA\Schema(type: "integer", example: 1)
         )
-    ], responses: [
+    ],
+    responses: [
         new OA\Response(
             response: 201,
             description: "Успешно обновлена задача",

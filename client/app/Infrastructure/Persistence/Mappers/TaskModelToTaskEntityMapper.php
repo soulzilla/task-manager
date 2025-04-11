@@ -17,6 +17,7 @@ class TaskModelToTaskEntityMapper
             title: $model->title,
             description: $model->description,
             status: $status,
+            importance: $model->importance,
             deadline: $model->deadline,
             createdAt: $model->created_at,
             updatedAt: $model->updated_at,

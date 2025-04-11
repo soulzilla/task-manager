@@ -11,6 +11,63 @@
     ],
     "paths": {
         "/tasks": {
+            "get": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Список задач",
+                "description": "Получить список задач",
+                "operationId": "listTasks",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Статус задачи",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "todo",
+                                "in_progress",
+                                "completed"
+                            ],
+                            "example": "completed"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешно получен список задач",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListTasksResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Клиентская ошибка",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "tasks"
@@ -62,12 +119,75 @@
             }
         },
         "/tasks/{id}": {
+            "get": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Получить задачу",
+                "operationId": "showTask",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор задачи для получения",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешно получена задача",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ShowTaskResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Клиентская ошибка",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "tasks"
                 ],
                 "summary": "Удалить задачу",
                 "operationId": "deleteTask",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Идентификатор задачи для обновления",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -182,43 +302,108 @@
                     }
                 }
             }
+        },
+        "/tasks/priority": {
+            "get": {
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Список задач",
+                "description": "Получить список задач",
+                "operationId": "listTasksByPriority",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Статус задачи",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "todo",
+                                "in_progress",
+                                "completed"
+                            ],
+                            "example": "completed"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешно получен список задач",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListTasksByPriorityResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Клиентская ошибка",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
-            "EmptyOutput": {
-                "description": "Пустой ответ",
-                "type": "object"
-            },
             "CreateTaskRequest": {
                 "description": "Запрос на создание задачи",
+                "required": [
+                    "title",
+                    "description",
+                    "importance",
+                    "deadline"
+                ],
                 "properties": {
                     "title": {
-                        "description": "Название задачи",
+                        "description": "Описание задачи",
                         "type": "string",
-                        "example": "Завершить проект"
+                        "example": "Подготовить презентацию"
                     },
                     "description": {
                         "description": "Описание задачи",
                         "type": "string",
-                        "example": "Необходимо завершить проект до конца месяца"
+                        "example": "Подготовить презентацию для заказчика"
                     },
                     "status": {
                         "description": "Статус задачи",
                         "type": "string",
-                        "example": "todo",
-                        "nullable": true
+                        "enum": [
+                            "todo",
+                            "in_progress",
+                            "completed"
+                        ],
+                        "example": "todo"
                     },
                     "importance": {
                         "description": "Важность задачи (1-5)",
                         "type": "integer",
-                        "example": 3
+                        "example": 4
                     },
                     "deadline": {
-                        "description": "Крайний срок выполнения задачи (Unix Timestamp)",
+                        "description": "Крайний срок выполнения задачи",
                         "type": "string",
                         "format": "timestamp",
-                        "example": "1697040000"
+                        "example": "2024-12-01 12:00:00"
                     }
                 },
                 "type": "object"
@@ -262,8 +447,9 @@
                         "example": 3
                     },
                     "deadline": {
-                        "description": "Дедлайн задачи в формате Unix-времени",
+                        "description": "Крайний срок выполнения задачи",
                         "type": "string",
+                        "format": "timestamp",
                         "example": "2025-12-31 23:59:59"
                     }
                 },
@@ -316,21 +502,127 @@
                 "description": "Ответ на успешное удаление задачи. Тело ответа пустое.",
                 "type": "object"
             },
+            "ListTasksByPriorityResponse": {
+                "title": "ListTasksByPriorityResponse",
+                "description": "Список задач с приоритетом",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "example": "Task title"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "example": "Task description"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "todo",
+                                        "in_progress",
+                                        "completed"
+                                    ],
+                                    "example": "completed"
+                                },
+                                "importance": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "deadline": {
+                                    "type": "string",
+                                    "example": "2023-10-01 12:00:00"
+                                },
+                                "is_overdue": {
+                                    "type": "boolean",
+                                    "example": false
+                                },
+                                "priority_score": {
+                                    "type": "integer",
+                                    "example": 5
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "example": "2023-10-01 12:00:00"
+                                },
+                                "updated_at": {
+                                    "type": "string",
+                                    "example": "2023-10-01 12:00:00"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ListTasksResponse": {
+                "properties": {
+                    "tasks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ShowTaskResponse"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ShowTaskResponse": {
+                "title": "ShowTaskResponse",
+                "description": "Ответ на запрос получения задачи",
+                "properties": {
+                    "id": {
+                        "description": "Идентификатор задачи",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Название задачи",
+                        "type": "string",
+                        "example": "Задача 1"
+                    },
+                    "description": {
+                        "description": "Описание задачи",
+                        "type": "string",
+                        "example": "Описание задачи 1"
+                    },
+                    "status": {
+                        "description": "Статус задачи",
+                        "type": "string",
+                        "example": "todo"
+                    },
+                    "importance": {
+                        "description": "Важность задачи",
+                        "type": "integer",
+                        "example": "3"
+                    },
+                    "deadline": {
+                        "description": "Срок выполнения задачи",
+                        "type": "string",
+                        "example": "2025-01-12 12:00:00"
+                    },
+                    "created_at": {
+                        "description": "Дата создания задачи",
+                        "type": "string",
+                        "example": "2023-10-01 12:00:00"
+                    },
+                    "updated_at": {
+                        "description": "Дата обновления задачи",
+                        "type": "string",
+                        "example": "2023-10-01 12:00:00"
+                    }
+                },
+                "type": "object"
+            },
             "UpdateTaskResponse": {
                 "description": "Ответ на успешное обновление задачи. Тело ответа пустое.",
                 "type": "object"
-            }
-        },
-        "parameters": {
-            "DeleteTaskRequest_id": {
-                "name": "id",
-                "in": "path",
-                "description": "Идентификатор задачи для удаления",
-                "required": true,
-                "schema": {
-                    "type": "integer",
-                    "example": 1
-                }
             }
         }
     },

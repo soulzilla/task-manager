@@ -12,26 +12,9 @@ use OpenApi\Attributes as OA;
 )]
 class DeleteTaskRequest extends FormRequest
 {
-    #[OA\Parameter(
-        parameter: "DeleteTaskRequest_id",
-        name: "id",
-        description: "Идентификатор задачи для удаления",
-        in: "path",
-        required: true,
-        schema: new OA\Schema(type: "integer", example: 1)
-    )]
-    public int $id;
-
     public function authorize(): bool
     {
         return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'id' => 'required|integer|exists:tasks,id',
-        ];
     }
 
     public function getTaskId(): int

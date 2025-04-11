@@ -10,5 +10,10 @@ use App\Domain\Entities\TaskEntity;
  */
 class TasksCollection extends Collection
 {
-
+    public function sortByPriorityScore(): void
+    {
+        usort($this->items, function (TaskEntity $a, TaskEntity $b) {
+            return $b->getPriorityScore() <=> $a->getPriorityScore();
+        });
+    }
 }

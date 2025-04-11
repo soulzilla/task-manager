@@ -18,6 +18,15 @@ use OpenApi\Attributes as OA;
         content: new OA\JsonContent(ref: "#/components/schemas/DeleteTaskRequest")
     ),
     tags: ["tasks"],
+    parameters: [
+        new OA\Parameter(
+            name: "id",
+            description: "Идентификатор задачи для обновления",
+            in: "path",
+            required: true,
+            schema: new OA\Schema(type: "integer", example: 1)
+        )
+    ],
     responses: [
         new OA\Response(
             response: 204,

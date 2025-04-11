@@ -10,11 +10,11 @@ class CreateTaskRequestToCreateTaskInputMapper
     public function map(CreateTaskRequest $request): CreateTaskInput
     {
         return new CreateTaskInput(
-            title: $request->title,
-            description: $request->description,
-            status: $request->status,
-            importance: $request->importance,
-            deadline: $request->deadline,
+            title: $request->getTitle(),
+            description: $request->getDescription(),
+            status: $request->getStatus(),
+            importance: $request->getImportance(),
+            deadline: $request->getDeadline(),
         );
     }
 }
